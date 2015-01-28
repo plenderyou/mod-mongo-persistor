@@ -80,7 +80,9 @@ The module supports the following operations
 
 ### Save
 
-Saves a document in the database.
+Saves a document in the database. 
+
+**N.B. this uses the underlying mongo save option which so will insert if the `_id` is not present or update if it is**
 
 To save a document send a JSON message to the module main address:
 
@@ -127,12 +129,69 @@ If an error occurs in saving the document a reply is returned:
 
     {
         "status": "error",
-        "message": <message>
+        "message": <message>,
+        "code" : <mongo code>
     }
 
 Where
 * `message` is an error message.
+* `code` is the underlying code from mongo.
 
+### Insert
+
+Inserts a document in the database.
+
+To insert a document send a JSON message to the module main address:
+
+    {
+        "action": "insert",
+        "collection": <collection>,
+        "document": <document>
+    }
+
+Where:
+* `collection` is the name of the MongoDB collection that you wish to save the document in. This field is mandatory.
+* `document` is the JSON document that you wish to save.
+
+An example would be:
+
+    {
+        "action": "insert",
+        "collection": "users",
+        "document": {
+            "name": "tim",
+            "age": 1000,
+            "shoesize": 3.14159,
+            "username": "tim",
+            "password": "wibble"
+        }
+    }
+
+When the save complete successfully, a reply message is sent back to the sender with the following data:
+
+    {
+        "status": "ok"
+    }
+
+The reply will also contain a field `_id` if the document that was inserted didn't specify an id, this will be an automatically generated UUID, for example:
+
+    {
+        "status": "ok"
+        "_id": "ffeef2a7-5658-4905-a37c-cfb19f70471d"
+    }
+
+
+If an error occurs in saving the document a reply is returned:
+
+    {
+        "status": "error",
+        "message": <message>,
+        "code" : <mongo code>
+    }
+
+Where
+* `message` is an error message.
+* `code` is the underlying code from mongo.
 
 ### Update
 
